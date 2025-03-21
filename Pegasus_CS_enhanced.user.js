@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name Pegasus CS enhanced
-// @version 3.8.2
-// @updateURL https://github.com/SiRENa3a/pegasus-cs-enhanced/blob/main/Pegasus_CS_enhanced_3.7.user.js
-// @downloadURL https://github.com/SiRENa3a/pegasus-cs-enhanced/blob/main/Pegasus_CS_enhanced_3.7.user.js
+// @version 3.8.3
+// @author Jason
+// @updateURL https://github.com/SiRENa3a/haha/raw/refs/heads/main/Pegasus_CS_enhanced.user.js
+// @downloadURL https://github.com/SiRENa3a/haha/raw/refs/heads/main/Pegasus_CS_enhanced.user.js
 // @description 高亮負數庫存及輸入框關鍵詞，新增 GP 計算功能，並調整指定輸入框寬度（減半再加 50px）
 // @match https://shop.pegasus.hk/portal/orders/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=pegasus.hk

@@ -35,9 +35,9 @@
             'AMD', 'Intel', 'A520', 'A620', 'B450', 'B550', 'B650', 'B840', 'B850',
             'B650E', 'X670', 'X670E', 'X870', 'X870E', 'H510', 'H610', 'H770',
             'B660', 'B760', 'B860', 'Z690', 'Z790', 'Z890',
-            'E-ATX ', 'ATX ', 'MATX ', 'ITX ', 'Micro-ATX ',
+            ' E-ATX', ' ATX', ' MATX', ' ITX ', ' Micro-ATX',
             'DDR4', 'DDR5',
-            'Basic', 'Premium', 'SFX ', 'SFX-L '
+            'Basic', 'Premium', ' SFX', ' SFX-L'
         ];
         const inputs = document.querySelectorAll('input.svelte-1dwz7uz:not(.keyword-highlighted)');
 

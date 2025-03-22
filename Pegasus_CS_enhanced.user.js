@@ -1,10 +1,14 @@
 // ==UserScript==
 // @name Pegasus CS enhanced
-// @version 3.9.0
-// @description 完整功能修正版：高亮库存/关键词/GP计算/输入框调整
+// @version 3.9.2
+// @author Jason
+// @updateURL https://github.com/SiRENa3a/haha/raw/refs/heads/main/Pegasus_CS_enhanced.user.js
+// @downloadURL https://github.com/SiRENa3a/haha/raw/refs/heads/main/Pegasus_CS_enhanced.user.js
+// @description 高亮負數庫存及輸入框關鍵詞，新增 GP 計算功能，並調整指定輸入框寬度
 // @match https://shop.pegasus.hk/portal/orders/*
-// @grant none
-// @run-at document-end
+// @icon https://www.google.com/s2/favicons?sz=64&domain=pegasus.hk
+// @grant unsafeWindow
+// @run-at document-start
 // ==/UserScript==
 
 (function() {
@@ -73,10 +77,7 @@
 
         findInputByLabel: function(labelText) {
             return Array.from(document.querySelectorAll('input.svelte-1dwz7uz'))
-                .find(input => {
-                    const labelElement = input.closest('div').querySelector(':scope > span');
-                    return labelElement && labelElement.textContent.trim() === labelText;
-                });
+                .find(input => input.parentNode.textContent.includes(labelText));
         },
 
         createGPDisplay: function(target) {
@@ -111,81 +112,33 @@
         }
     };
 
-    // 输入框宽度调整模块 (专项强化修正)
+    // 输入框宽度调整模块
     const widthAdjuster = {
-        config: {
-            targetLabels: ["運費", "手續費", "雜費", "附加費", "總額", "總成本"],
-            widthFormula: baseWidth => (baseWidth / 2) + 50
-        },
-
+        targetLabels: ['運費', '手續費', '雜費', '附加費', '總額', '總成本'],
+        
         init: function() {
-            this.observer = new MutationObserver(this.handleMutations.bind(this));
-            this.observer.observe(document.body, {
-                childList: true,
-                subtree: true,
-                attributeFilter: ['class']
-            });
-            this.processAllInputs();
-            this.retryCounter = 0;
-            this.startRetryMechanism();
-        },
-
-        processAllInputs: function() {
-            this.config.targetLabels.forEach(label => {
-                const input = this.findInputByExactLabel(label);
+            this.targetLabels.forEach(label => {
+                const input = this.findInputByLabel(label);
                 if (input && !input.dataset.widthAdjusted) {
-                    this.applyWidthAdjustment(input);
+                    this.adjustWidth(input);
+                    input.dataset.widthAdjusted = true;
                 }
             });
         },
 
-        findInputByExactLabel: function(label) {
+        findInputByLabel: function(label) {
             return Array.from(document.querySelectorAll('input.svelte-1dwz7uz'))
-                .find(input => {
-                    const labelElement = input.closest('div').querySelector(':scope > span');
-                    return labelElement && labelElement.textContent.trim() === label;
-                });
+                .find(input => input.parentNode.textContent.includes(label));
         },
 
-        applyWidthAdjustment: function(input) {
+        adjustWidth: function(input) {
             const style = window.getComputedStyle(input);
-            
-            // 计算原始宽度 (优先使用计算样式，失败时使用offsetWidth)
-            const baseWidth = parseFloat(style.width) || 
-                             input.offsetWidth - 
-                             parseFloat(style.paddingLeft) - 
-                             parseFloat(style.paddingRight);
-
-            // 应用新宽度
+            const baseWidth = parseFloat(style.width);
             if (!isNaN(baseWidth)) {
-                input.style.cssText = `
-                    width: ${this.config.widthFormula(baseWidth)}px !important;
-                    min-width: unset !important;
-                    max-width: unset !important;
-                    box-sizing: content-box !important;
-                `;
-                input.dataset.widthAdjusted = 'true';
-                console.log(`已調整輸入框寬度: ${input.parentNode.textContent.trim()}`, input.style.width);
+                input.style.width = `${(baseWidth / 2) + 50}px`;
+                input.style.minWidth = 'unset';
+                input.style.boxSizing = 'content-box';
             }
-        },
-
-        handleMutations: function(mutations) {
-            mutations.forEach(mutation => {
-                if (mutation.type === 'childList') {
-                    this.processAllInputs();
-                }
-            });
-        },
-
-        startRetryMechanism: function() {
-            const retryInterval = setInterval(() => {
-                if (this.retryCounter++ < 10) {
-                    this.processAllInputs();
-                } else {
-                    clearInterval(retryInterval);
-                    console.warn('達到最大重試次數');
-                }
-            }, 1500);
         }
     };
 

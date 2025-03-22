@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Pegasus CS enhanced
-// @version 3.9.2
+// @version 3.9.3
 // @author Jason
 // @updateURL https://github.com/SiRENa3a/haha/raw/refs/heads/main/Pegasus_CS_enhanced.user.js
 // @downloadURL https://github.com/SiRENa3a/haha/raw/refs/heads/main/Pegasus_CS_enhanced.user.js
@@ -24,14 +24,21 @@
         highlightNegativeStock: function() {
             document.querySelectorAll('p:not(.pegasus-highlighted)').forEach(p => {
                 if (p.textContent.includes('庫存 : -')) {
-                    p.style.cssText = 'background: orange!important; color: red!important; font-weight: bold!important;';
+                    p.style.cssText = 'background: orange!important; color: red!important; font-weight: bold!important; font-size: 120%!important';
                     p.classList.add('pegasus-highlighted');
                 }
             });
         },
 
         highlightKeywords: function() {
-            const keywords = ['AMD', 'Intel', 'DDR4', 'DDR5', 'ATX', 'MATX'];
+            const keywords = [
+             'AMD', 'Intel', 'A520', 'A620', 'B450', 'B550', 'B650', 'B840', 'B850',
+             'B650E', 'X670', 'X670E', 'X870', 'X870E', 'H510', 'H610', 'H770',
+             'B660', 'B760', 'B860', 'Z690', 'Z790', 'Z890',
+             ' E-ATX', ' ATX', ' MATX', ' ITX ', ' Micro-ATX',
+             'DDR4', 'DDR5',
+             'Basic', 'Premium', ' SFX', ' SFX-L'
+         ];
             document.querySelectorAll('input.svelte-1dwz7uz').forEach(input => {
                 if (input.parentNode.querySelector('.keyword-overlay')) return;
 
@@ -41,8 +48,8 @@
                     overlay.className = 'keyword-overlay';
                     overlay.style.cssText = `
                         position: absolute;
-                        left: ${input.offsetLeft + 50}px;
-                        top: ${input.offsetTop - 10}px;
+                        left: ${input.offsetLeft + 35}px;
+                        top: ${input.offsetTop - 45}px;
                         background: red;
                         color: white;
                         padding: 2px 5px;

@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Pegasus CS enhanced
-// @version 3.9.3
+// @version 3.9.4
 // @author Jason
 // @updateURL https://github.com/SiRENa3a/haha/raw/refs/heads/main/Pegasus_CS_enhanced.user.js
 // @downloadURL https://github.com/SiRENa3a/haha/raw/refs/heads/main/Pegasus_CS_enhanced.user.js
@@ -55,7 +55,7 @@
                         padding: 2px 5px;
                         border-radius: 3px;
                     `;
-                    overlay.textContent = matches.join(', ');
+                    overlay.textContent = matches.join(',  ');
                     input.parentNode.style.position = 'relative';
                     input.parentNode.appendChild(overlay);
                 }

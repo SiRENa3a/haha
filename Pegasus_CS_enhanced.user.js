@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name         Pegasus CS enhanced
-// @version      3.8.9
-// @description  完整功能修正版：高亮库存/关键词/GP计算/输入框调整
-// @match        https://shop.pegasus.hk/portal/orders/*
-// @grant        none
-// @run-at       document-end
+// @name Pegasus CS enhanced
+// @version 3.9.0
+// @description 完整功能修正版：高亮库存/关键词/GP计算/输入框调整
+// @match https://shop.pegasus.hk/portal/orders/*
+// @grant none
+// @run-at document-end
 // ==/UserScript==
 
 (function() {
@@ -73,7 +73,10 @@
 
         findInputByLabel: function(labelText) {
             return Array.from(document.querySelectorAll('input.svelte-1dwz7uz'))
-                .find(input => input.parentNode.textContent.includes(labelText));
+                .find(input => {
+                    const labelElement = input.closest('div').querySelector(':scope > span');
+                    return labelElement && labelElement.textContent.trim() === labelText;
+                });
         },
 
         createGPDisplay: function(target) {
@@ -108,33 +111,81 @@
         }
     };
 
-    // 输入框宽度调整模块
+    // 输入框宽度调整模块 (专项强化修正)
     const widthAdjuster = {
-        targetLabels: ['運費', '手續費', '雜費', '附加費', '總額', '總成本'],
-        
+        config: {
+            targetLabels: ["運費", "手續費", "雜費", "附加費", "總額", "總成本"],
+            widthFormula: baseWidth => (baseWidth / 2) + 50
+        },
+
         init: function() {
-            this.targetLabels.forEach(label => {
-                const input = this.findInputByLabel(label);
+            this.observer = new MutationObserver(this.handleMutations.bind(this));
+            this.observer.observe(document.body, {
+                childList: true,
+                subtree: true,
+                attributeFilter: ['class']
+            });
+            this.processAllInputs();
+            this.retryCounter = 0;
+            this.startRetryMechanism();
+        },
+
+        processAllInputs: function() {
+            this.config.targetLabels.forEach(label => {
+                const input = this.findInputByExactLabel(label);
                 if (input && !input.dataset.widthAdjusted) {
-                    this.adjustWidth(input);
-                    input.dataset.widthAdjusted = true;
+                    this.applyWidthAdjustment(input);
                 }
             });
         },
 
-        findInputByLabel: function(label) {
+        findInputByExactLabel: function(label) {
             return Array.from(document.querySelectorAll('input.svelte-1dwz7uz'))
-                .find(input => input.parentNode.textContent.includes(label));
+                .find(input => {
+                    const labelElement = input.closest('div').querySelector(':scope > span');
+                    return labelElement && labelElement.textContent.trim() === label;
+                });
         },
 
-        adjustWidth: function(input) {
+        applyWidthAdjustment: function(input) {
             const style = window.getComputedStyle(input);
-            const baseWidth = parseFloat(style.width);
+            
+            // 计算原始宽度 (优先使用计算样式，失败时使用offsetWidth)
+            const baseWidth = parseFloat(style.width) || 
+                             input.offsetWidth - 
+                             parseFloat(style.paddingLeft) - 
+                             parseFloat(style.paddingRight);
+
+            // 应用新宽度
             if (!isNaN(baseWidth)) {
-                input.style.width = `${(baseWidth / 2) + 50}px`;
-                input.style.minWidth = 'unset';
-                input.style.boxSizing = 'content-box';
+                input.style.cssText = `
+                    width: ${this.config.widthFormula(baseWidth)}px !important;
+                    min-width: unset !important;
+                    max-width: unset !important;
+                    box-sizing: content-box !important;
+                `;
+                input.dataset.widthAdjusted = 'true';
+                console.log(`已調整輸入框寬度: ${input.parentNode.textContent.trim()}`, input.style.width);
             }
+        },
+
+        handleMutations: function(mutations) {
+            mutations.forEach(mutation => {
+                if (mutation.type === 'childList') {
+                    this.processAllInputs();
+                }
+            });
+        },
+
+        startRetryMechanism: function() {
+            const retryInterval = setInterval(() => {
+                if (this.retryCounter++ < 10) {
+                    this.processAllInputs();
+                } else {
+                    clearInterval(retryInterval);
+                    console.warn('達到最大重試次數');
+                }
+            }, 1500);
         }
     };
 

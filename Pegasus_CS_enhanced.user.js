@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name Pegasus CS enhanced
-// @version 3.8.6
+// @version 3.8.7
 // @author Jason
-// @description 高亮負數庫存及輸入框關鍵詞，新增 GP 計算功能，並調整指定輸入框寬度（減半再加 50px）
+// @description 高亮負數庫存及輸入框關鍵詞，新增 GP 計算功能，並調整指定輸入框寬度
 // @match https://shop.pegasus.hk/portal/orders/*
 // @grant none
 // @run-at document-start
@@ -13,175 +13,166 @@
 
     // 高亮負數庫存
     function highlightText() {
-        const paras = document.querySelectorAll('p:not(.pegasus-highlighted)');
-        paras.forEach(para => {
-            const text = para.innerText;
-            const highlightText = "庫存 : -";
-            if (text.includes(highlightText)) {
-                para.style.backgroundColor = "orange";
-                para.style.color = "red";
-                para.style.fontWeight = "bold";
-                para.style.fontSize = "120%";
-                para.style.textDecoration = "underline";
-                para.classList.add('pegasus-highlighted');
-            }
-        });
-
-        // 高亮輸入框中的關鍵詞（修正語法錯誤）
-        const keywords = [
-            'AMD', 'Intel', 'A520', 'A620', 'B450', 'B550', 'B650', 'B840', 'B850',
-            'B650E', 'X670', 'X670E', 'X870', 'X870E', 'H510', 'H610', 'H770',
-            'B660', 'B760', 'B860', 'Z690', 'Z790', 'Z890',
-            'E-ATX', 'ATX', 'MATX', 'ITX', 'Micro-ATX',
-            'DDR4', 'DDR5',
-            'Basic', 'Premium', 'SFX', 'SFX-L'
-        ];
-        
-        const inputs = document.querySelectorAll('input.svelte-1dwz7uz:not(.keyword-highlighted)');
-        inputs.forEach(input => {
-            const originalValue = input.value;
-
-            // 清除之前的覆蓋層（如果存在）
-            let existingOverlay = input.parentNode.querySelector('.highlight-overlay');
-            if (existingOverlay) {
-                existingOverlay.remove();
-            }
-
-            // 創建一個新的覆蓋層
-            const overlay = document.createElement('div');
-            overlay.classList.add('highlight-overlay');
-            overlay.style.position = 'absolute';
-            overlay.style.top = `${input.offsetTop - 50}px`;
-            overlay.style.left = `${input.offsetLeft + 50}px`;
-            overlay.style.width = `${input.offsetWidth}px`;
-            overlay.style.height = `${input.offsetHeight}px`;
-            overlay.style.lineHeight = `${input.offsetHeight}px`;
-            overlay.style.pointerEvents = 'none';
-            overlay.style.whiteSpace = 'nowrap';
-            overlay.style.overflow = 'hidden';
-
-            // 提取並高亮關鍵詞
-            let highlightedContent = '';
-            keywords.forEach(keyword => {
-                if (originalValue.includes(keyword)) {
-                    highlightedContent += `<span style="background-color: red; color: white; font-weight: bold; padding: 2px;">${keyword}</span> `;
+        try {
+            // 高亮負數庫存段落
+            document.querySelectorAll('p:not(.pegasus-highlighted)').forEach(para => {
+                if (para.innerText.includes("庫存 : -")) {
+                    para.style.cssText = 'background-color: orange !important; color: red !important; font-weight: bold !important; font-size: 120% !important; text-decoration: underline !important;';
+                    para.classList.add('pegasus-highlighted');
                 }
             });
 
-            if (highlightedContent) {
-                overlay.innerHTML = highlightedContent.trim();
-                input.parentNode.style.position = 'relative';
-                input.parentNode.appendChild(overlay);
-                input.classList.add('keyword-highlighted');
-            }
-        });
-    }
+            // 高亮輸入框關鍵詞
+            const keywords = [
+                'AMD', 'Intel', 'A520', 'A620', 'B450', 'B550', 'B650', 'B840', 'B850',
+                'B650E', 'X670', 'X670E', 'X870', 'X870E', 'H510', 'H610', 'H770',
+                'B660', 'B760', 'B860', 'Z690', 'Z790', 'Z890',
+                'E-ATX', 'ATX', 'MATX', 'ITX', 'Micro-ATX',
+                'DDR4', 'DDR5',
+                'Basic', 'Premium', 'SFX', 'SFX-L'
+            ];
 
-    // 新增 GP 計算功能（修正變量作用域問題）
-    function addGPColumn() {
-        const getInputs = () => {
-            return {
-                totalAmountInput: Array.from(document.querySelectorAll('input[type="number"].svelte-1dwz7uz'))
-                    .find(input => input.parentNode.textContent.includes("總額")),
-                additionalFeeInput: Array.from(document.querySelectorAll('input[type="number"].svelte-1dwz7uz'))
-                    .find(input => input.parentNode.textContent.includes("附加費")),
-                totalCostInput: Array.from(document.querySelectorAll('input[type="number"].svelte-1dwz7uz'))
-                    .find(input => input.parentNode.textContent.includes("總成本"))
-            };
-        };
+            document.querySelectorAll('input.svelte-1dwz7uz:not(.keyword-highlighted)').forEach(input => {
+                const existingOverlay = input.parentNode.querySelector('.highlight-overlay');
+                if (existingOverlay) existingOverlay.remove();
 
-        const { totalAmountInput, additionalFeeInput, totalCostInput } = getInputs();
-        if (!totalAmountInput || !additionalFeeInput || !totalCostInput) return;
+                const overlay = document.createElement('div');
+                overlay.className = 'highlight-overlay';
+                overlay.style.cssText = `
+                    position: absolute;
+                    top: ${input.offsetTop - 50}px;
+                    left: ${input.offsetLeft + 50}px;
+                    width: ${input.offsetWidth}px;
+                    height: ${input.offsetHeight}px;
+                    line-height: ${input.offsetHeight}px;
+                    pointer-events: none;
+                    white-space: nowrap;
+                    overflow: hidden;
+                `;
 
-        if (!document.querySelector('.gp-result')) {
-            const gpWrapper = document.createElement('div');
-            gpWrapper.style.display = "inline-block";
-            gpWrapper.style.marginLeft = "10px";
+                const highlighted = keywords.filter(k => input.value.includes(k))
+                    .map(k => `<span style="background:red;color:white;font-weight:bold;padding:2px;">${k}</span>`)
+                    .join(' ');
 
-            const gpLabel = document.createElement('span');
-            gpLabel.textContent = "GP: ";
-            gpLabel.style.fontWeight = "bold";
-
-            const gpResult = document.createElement('span');
-            gpResult.className = "gp-result";
-            gpResult.textContent = "";
-            gpResult.style.fontWeight = "bold";
-
-            gpWrapper.appendChild(gpLabel);
-            gpWrapper.appendChild(gpResult);
-            totalCostInput.parentNode.insertBefore(gpWrapper, totalCostInput.nextSibling);
-
-            // 持續更新 GP 值
-            const updateGP = () => {
-                const inputs = getInputs();
-                if (!inputs.totalAmountInput || !inputs.additionalFeeInput || !inputs.totalCostInput) return;
-
-                const totalAmount = parseFloat(inputs.totalAmountInput.value) || 0;
-                const additionalFee = parseFloat(inputs.additionalFeeInput.value) || 0;
-                const totalCost = parseFloat(inputs.totalCostInput.value) || 0;
-
-                if (isNaN(totalAmount) || isNaN(additionalFee) || isNaN(totalCost)) {
-                    gpResult.textContent = 'N/A';
-                    gpResult.style.color = 'gray';
-                } else {
-                    const gpValue = totalAmount - additionalFee - totalCost;
-                    gpResult.textContent = gpValue.toFixed(1);
-                    gpResult.style.color = gpValue >= 0 ? "green" : "red";
+                if (highlighted) {
+                    overlay.innerHTML = highlighted;
+                    input.parentNode.style.position = 'relative';
+                    input.parentNode.appendChild(overlay);
+                    input.classList.add('keyword-highlighted');
                 }
-            };
-            setInterval(updateGP, 1000);
-            updateGP(); // 立即執行一次
+            });
+        } catch (err) {
+            console.error('[高亮功能錯誤]', err);
         }
     }
 
-    // 調整指定輸入框寬度功能
-    function adjustSpecificInputWidth() {
-        const targetLabels = ["運費", "手續費", "雜費", "附加費", "總額", "總成本"];
-        targetLabels.forEach(label => {
-            const inputElement = Array.from(document.querySelectorAll('input.svelte-1dwz7uz')).find(input =>
-                input.parentNode.textContent.includes(label)
-            );
-            
-            if (inputElement && !inputElement.dataset.adjustedWidth) {
-                const originalWidth = parseFloat(window.getComputedStyle(inputElement).width);
-                inputElement.style.width = `${originalWidth / 2 + 50}px`;
-                inputElement.dataset.adjustedWidth = true;
+    // GP計算功能
+    function initGPCalculator() {
+        try {
+            const getInput = (text) => 
+                Array.from(document.querySelectorAll('input.svelte-1dwz7uz'))
+                    .find(input => input.parentNode.textContent.includes(text));
+
+            const inputs = {
+                total: getInput('總額'),
+                fee: getInput('附加費'),
+                cost: getInput('總成本')
+            };
+
+            if (!inputs.total || !inputs.fee || !inputs.cost) return;
+
+            if (!document.querySelector('.gp-result')) {
+                const gpDiv = document.createElement('div');
+                gpDiv.innerHTML = `
+                    <span style="font-weight:bold">GP: </span>
+                    <span class="gp-result" style="font-weight:bold"></span>
+                `;
+                gpDiv.style.cssText = 'display: inline-block; margin-left: 10px;';
+                inputs.cost.parentNode.insertBefore(gpDiv, inputs.cost.nextSibling);
             }
-        });
+
+            const updateGP = () => {
+                const gpResult = document.querySelector('.gp-result');
+                if (!gpResult) return;
+
+                const values = {
+                    total: parseFloat(inputs.total.value) || 0,
+                    fee: parseFloat(inputs.fee.value) || 0,
+                    cost: parseFloat(inputs.cost.value) || 0
+                };
+
+                if ([values.total, values.fee, values.cost].some(isNaN)) {
+                    gpResult.textContent = 'N/A';
+                    gpResult.style.color = 'gray';
+                } else {
+                    const gp = values.total - values.fee - values.cost;
+                    gpResult.textContent = gp.toFixed(1);
+                    gpResult.style.color = gp >= 0 ? 'green' : 'red';
+                }
+            };
+
+            // 即時更新監聽
+            [inputs.total, inputs.fee, inputs.cost].forEach(input => {
+                input.addEventListener('input', updateGP);
+            });
+            setInterval(updateGP, 1000);
+            updateGP();
+        } catch (err) {
+            console.error('[GP計算錯誤]', err);
+        }
     }
 
-    // 使用多層防禦策略（參考首页优化增强版）
-    const initializeScript = () => {
-        // 立即執行一次
-        highlightText();
-        addGPColumn();
-        adjustSpecificInputWidth();
+    // 調整輸入框寬度
+    function adjustInputWidth() {
+        try {
+            const labels = ["運費", "手續費", "雜費", "附加費", "總額", "總成本"];
+            labels.forEach(label => {
+                const input = Array.from(document.querySelectorAll('input.svelte-1dwz7uz'))
+                    .find(i => i.parentNode.textContent.includes(label));
+                
+                if (input && !input.dataset.resized) {
+                    const originalWidth = parseFloat(getComputedStyle(input).width);
+                    input.style.width = `${originalWidth / 2 + 50}px`;
+                    input.dataset.resized = 'true';
+                }
+            });
+        } catch (err) {
+            console.error('[寬度調整錯誤]', err);
+        }
+    }
 
-        // 設置 DOM 監控
-        const observer = new MutationObserver(() => {
-            highlightText();
-            addGPColumn();
-            adjustSpecificInputWidth();
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
+    // 主初始化函數
+    const main = () => {
+        highlightText();
+        initGPCalculator();
+        adjustInputWidth();
+        
+        // 設置DOM監聽
+        new MutationObserver(mutations => {
+            if (mutations.some(m => m.addedNodes.length > 0)) {
+                highlightText();
+                initGPCalculator();
+                adjustInputWidth();
+            }
+        }).observe(document.body, {childList: true, subtree: true});
 
         // 設置定期檢查
-        let retryCount = 0;
-        const checkAndRun = () => {
-            if (retryCount++ < 10) {
+        let retry = 0;
+        const checker = () => {
+            if (retry++ < 10) {
                 highlightText();
-                addGPColumn();
-                adjustSpecificInputWidth();
-                setTimeout(checkAndRun, 1000);
+                initGPCalculator();
+                adjustInputWidth();
+                setTimeout(checker, 1000);
             }
         };
-        checkAndRun();
+        checker();
     };
 
     // 啟動腳本
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeScript);
+        document.addEventListener('DOMContentLoaded', main);
     } else {
-        initializeScript();
+        main();
     }
 })();

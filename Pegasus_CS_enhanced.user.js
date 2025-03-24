@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Pegasus CS enhanced
-// @version 3.9.10
+// @version 3.9.11
 // @author Jason
 // @updateURL https://github.com/SiRENa3a/haha/raw/refs/heads/main/Pegasus_CS_enhanced.user.js
 // @downloadURL https://github.com/SiRENa3a/haha/raw/refs/heads/main/Pegasus_CS_enhanced.user.js

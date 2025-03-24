@@ -6,6 +6,7 @@
 // @downloadURL https://github.com/SiRENa3a/haha/raw/refs/heads/main/Pegasus_CS_enhanced.user.js
 // @description 高亮負數庫存及輸入框關鍵詞，新增 GP 計算功能，並調整指定輸入框寬度
 // @match https://shop.pegasus.hk/portal/orders/*
+// @match https://shop.pegasus.hk/portal
 // @icon https://www.google.com/s2/favicons?sz=64&domain=pegasus.hk
 // @grant unsafeWindow
 // @run-at document-start

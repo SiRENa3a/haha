@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Pegasus CS enhanced
-// @version 3.9.4
+// @version 3.9.8
 // @author Jason
 // @updateURL https://github.com/SiRENa3a/haha/raw/refs/heads/main/Pegasus_CS_enhanced.user.js
 // @downloadURL https://github.com/SiRENa3a/haha/raw/refs/heads/main/Pegasus_CS_enhanced.user.js
@@ -32,32 +32,52 @@
 
         highlightKeywords: function() {
             const keywords = [
-             'AMD', 'Intel', 'A520', 'A620', 'B450', 'B550', 'B650', 'B840', 'B850',
-             'B650E', 'X670', 'X670E', 'X870', 'X870E', 'H510', 'H610', 'H770',
-             'B660', 'B760', 'B860', 'Z690', 'Z790', 'Z890',
-             ' E-ATX', ' ATX', ' MATX', ' ITX ', ' Micro-ATX',
-             'DDR4', 'DDR5',
-             'Basic', 'Premium', ' SFX', ' SFX-L'
-         ];
-            document.querySelectorAll('input.svelte-1dwz7uz').forEach(input => {
-                if (input.parentNode.querySelector('.keyword-overlay')) return;
+                'AMD', 'Intel', 'A520', 'A620', 'B450', 'B550', 'B650', 'B840', 'B850',
+                'B650E', 'X670', 'X670E', 'X870', 'X870E', 'H510', 'H610', 'H770',
+                'B660', 'B760', 'B860', 'Z690', 'Z790', 'Z890',
+                ' E-ATX', ' ATX', ' MATX', ' ITX ', ' Micro-ATX',
+                'DDR4', 'DDR5',
+                'Basic', 'Premium', ' SFX', ' SFX-L'
+            ];
 
-                const matches = keywords.filter(k => input.value.includes(k));
-                if (matches.length > 0) {
-                    const overlay = document.createElement('div');
-                    overlay.className = 'keyword-overlay';
-                    overlay.style.cssText = `
-                        position: absolute;
-                        left: ${input.offsetLeft + 35}px;
-                        top: ${input.offsetTop - 45}px;
-                        background: red;
-                        color: white;
-                        padding: 2px 5px;
-                        border-radius: 3px;
-                    `;
-                    overlay.textContent = matches.join(',  ');
-                    input.parentNode.style.position = 'relative';
+            const inputs = document.querySelectorAll('input.svelte-1dwz7uz:not(.keyword-highlighted)');
+
+            inputs.forEach(input => {
+                const originalValue = input.value;
+
+                // 清除之前的覆盖层（如果存在）
+                let existingOverlay = input.parentNode.querySelector('.highlight-overlay');
+                if (existingOverlay) {
+                    existingOverlay.remove();
+                }
+
+                // 创建一个新的覆盖层
+                const overlay = document.createElement('div');
+                overlay.classList.add('highlight-overlay');
+                overlay.style.position = 'absolute';
+                overlay.style.top = `${input.offsetTop - 50}px`; // 向上移动 50px
+                overlay.style.left = `${input.offsetLeft + 50}px`; // 向右移动 50px
+                overlay.style.width = `${input.offsetWidth}px`;
+                overlay.style.height = `${input.offsetHeight}px`;
+                overlay.style.lineHeight = `${input.offsetHeight}px`;
+                overlay.style.pointerEvents = 'none'; // 防止覆盖层影响输入框操作
+                overlay.style.whiteSpace = 'nowrap';
+                overlay.style.overflow = 'hidden';
+
+                // 提取并高亮关键词
+                let highlightedContent = '';
+                keywords.forEach(keyword => {
+                    if (originalValue.includes(keyword)) {
+                        highlightedContent += `<span style="background-color: red; color: white; font-weight: bold; padding: 2px;">${keyword}</span> `;
+                    }
+                });
+
+                // 如果有匹配的关键词，将其插入覆盖层
+                if (highlightedContent) {
+                    overlay.innerHTML = highlightedContent.trim();
+                    input.parentNode.style.position = 'relative'; // 确保父容器是相对定位
                     input.parentNode.appendChild(overlay);
+                    input.classList.add('keyword-highlighted'); // 标记已处理过的输入框
                 }
             });
         }
@@ -122,7 +142,7 @@
     // 输入框宽度调整模块
     const widthAdjuster = {
         targetLabels: ['運費', '手續費', '雜費', '附加費', '總額', '總成本'],
-        
+
         init: function() {
             this.targetLabels.forEach(label => {
                 const input = this.findInputByLabel(label);

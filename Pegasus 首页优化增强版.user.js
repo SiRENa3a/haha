@@ -1,7 +1,9 @@
 // ==UserScript==
 // @name         Pegasus 首页优化增强版
-// @version      1.2.3
+// @version      1.2.4
 // @author       Jason
+// @updateURL https://github.com/SiRENa3a/haha/raw/refs/heads/main/Pegasus%20%E9%A6%96%E9%A1%B5%E4%BC%98%E5%8C%96%E5%A2%9E%E5%BC%BA%E7%89%88.user.js
+// @downloadURL https://github.com/SiRENa3a/haha/raw/refs/heads/main/Pegasus%20%E9%A6%96%E9%A1%B5%E4%BC%98%E5%8C%96%E5%A2%9E%E5%BC%BA%E7%89%88.user.js
 // @description  禁用輪播組件和 lightbox 元素，確保穩定運行
 // @match        https://shop.pegasus.hk/
 // @exclude      https://shop.pegasus.hk/portal/*

@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Pegasus CS enhanced
-// @version 3.9.8
+// @version 3.9.10
 // @author Jason
 // @updateURL https://github.com/SiRENa3a/haha/raw/refs/heads/main/Pegasus_CS_enhanced.user.js
 // @downloadURL https://github.com/SiRENa3a/haha/raw/refs/heads/main/Pegasus_CS_enhanced.user.js
@@ -162,7 +162,7 @@
             const style = window.getComputedStyle(input);
             const baseWidth = parseFloat(style.width);
             if (!isNaN(baseWidth)) {
-                input.style.width = `${(baseWidth / 2) + 50}px`;
+                input.style.width = `${(baseWidth / 2.3 )}px`;
                 input.style.minWidth = 'unset';
                 input.style.boxSizing = 'content-box';
             }

@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Pegasus 首页优化增强版
-// @version      1.2.4
+// @version      1.2.6
 // @author       Jason
 // @updateURL https://github.com/SiRENa3a/haha/raw/refs/heads/main/Pegasus%20%E9%A6%96%E9%A1%B5%E4%BC%98%E5%8C%96%E5%A2%9E%E5%BC%BA%E7%89%88.user.js
 // @downloadURL https://github.com/SiRENa3a/haha/raw/refs/heads/main/Pegasus%20%E9%A6%96%E9%A1%B5%E4%BC%98%E5%8C%96%E5%A2%9E%E5%BC%BA%E7%89%88.user.js
-// @description  禁用輪播組件和 lightbox 元素，確保穩定運行
+// @description  禁用輪播組件，確保穩定運行
 // @match        https://shop.pegasus.hk/
 // @exclude      https://shop.pegasus.hk/portal/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=pegasus.hk
@@ -21,7 +21,6 @@
         swiper-slide,
         [class*="carousel"],
         [class*="swiper"],
-        .lightbox.svelte-txawuw,
         /* 新增屏蔽區域 */
         .container.svelte-vc3ghx,
         section.home-product.svelte-1x9eh70,
@@ -41,7 +40,7 @@
             // 靜態節點移除
             const unwantedElements = [...mutation.addedNodes].filter(node =>
                 node.nodeType === 1 && (
-                    node.matches('swiper-container, swiper-slide, .lightbox.svelte-txawuw, .container.svelte-vc3ghx, section.home-product.svelte-1x9eh70, section.home-hot.svelte-1x9eh70') ||
+                    node.matches('swiper-container, swiper-slide, .container.svelte-vc3ghx, section.home-product.svelte-1x9eh70, section.home-hot.svelte-1x9eh70') ||
                     node.classList?.contains('swiper') ||
                     node.classList?.contains('carousel')
                 )
@@ -85,7 +84,6 @@
         setInterval(() => {
             const targets = [
                 '.swiper-container', '.swiper-wrapper',
-                '.lightbox.svelte-txawuw',
                 '.container.svelte-vc3ghx',
                 'section.home-product.svelte-1x9eh70',
                 'section.home-hot.svelte-1x9eh70'
@@ -104,7 +102,6 @@
 
             const elements = document.querySelectorAll(`
                 swiper-container, swiper-slide,
-                .lightbox.svelte-txawuw,
                 .container.svelte-vc3ghx,
                 section.home-product.svelte-1x9eh70,
                 section.home-hot.svelte-1x9eh70
@@ -123,8 +120,7 @@
         if (tagName.toLowerCase() === 'script') {
             element.addEventListener('load', () => {
                 const blockedResources = [
-                    'swiper', 'lightbox',
-                    'home-product', 'home-hot'
+                    'swiper', 'home-product', 'home-hot'
                 ];
                 if (blockedResources.some(keyword => element.src.includes(keyword))) {
                     console.log('[腳本攔截] 阻止相關腳本運行:', element.src);
@@ -135,10 +131,20 @@
         return element;
     };
 
+    // Cookie 過期日期設定函數
+    function setCookie(cName, cValue, expDays) {
+        let date = new Date();
+        date.setTime(date.getTime() + (expDays * 24 * 60 * 60 * 1000));
+        const expires = "expires=" + date.toUTCString();
+        document.cookie = cName + "=" + cValue + "; " + expires + "; path=/";
+    }
+
     // 執行入口
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initGuard);
+        setCookie('popUpNotShow', 'true', 999999);
     } else {
         initGuard();
+        setCookie('popUpNotShow', 'true', 999999);
     }
 })();

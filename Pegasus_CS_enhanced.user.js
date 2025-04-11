@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Pegasus CS enhanced
-// @version 3.9.12
+// @version 3.9.13
 // @description 高亮負數庫存及輸入框關鍵詞，新增 GP 計算功能，並調整指定輸入框寬度
 // @match https://shop.pegasus.hk/portal/orders/*
 // @match https://shop.pegasus.hk/portal
@@ -55,8 +55,8 @@
                     const overlay = document.createElement('div');
                     overlay.classList.add('highlight-overlay');
                     overlay.style.position = 'absolute';
-                    overlay.style.top = `${input.offsetTop - 45}px`; // 向上移动 10px
-                    overlay.style.left = `${input.offsetLeft}px`;
+                    overlay.style.top = `${input.offsetTop - 45}px`; // 向上移动
+                    overlay.style.left = `${input.offsetLeft + 50}px`;
                     overlay.style.width = `${input.offsetWidth}px`;
                     overlay.style.height = `${input.offsetHeight}px`;
                     overlay.style.lineHeight = `${input.offsetHeight}px`;

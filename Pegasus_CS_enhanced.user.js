@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name Pegasus CS enhanced
-// @version 3.10.1
+// @version 3.11.1
 // @author Jason
 // @description 高亮負數庫存及輸入框關鍵詞，GP 計算功能
 // @match https://shop.pegasus.hk/portal/orders/*
+// @exclude https://shop.pegasus.hk/portal/orders/*/invoice
 // @match https://shop.pegasus.hk/portal
 // @grant none
 // @run-at document-end
@@ -41,7 +42,7 @@
             'DDR4', 'DDR5',
             'Basic', 'Premium', ' SFX', ' SFX-L'
         ];
-        document.querySelectorAll('input.svelte-1dwz7uz:not(.keyword-highlighted)').forEach(input => {
+        document.querySelectorAll('input.svelte-qrj5qa:not(.keyword-highlighted)').forEach(input => {
             const matches = keywords.filter(k => input.value.includes(k));
             if (matches.length > 0) {
                 const rect = input.getBoundingClientRect();
@@ -164,7 +165,7 @@
     // 持續刷新初始化
     setInterval(() => {
         safeInitModules();
-    }, 1000);
+    }, 500);
 
     initModules();
 

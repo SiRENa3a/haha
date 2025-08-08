@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Pegasus CS enhanced
-// @version 3.11.1
+// @version 3.11.3
 // @author Jason
 // @description 高亮負數庫存及輸入框關鍵詞，GP 計算功能
 // @match https://shop.pegasus.hk/portal/orders/*

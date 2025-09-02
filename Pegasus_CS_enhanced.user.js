@@ -42,7 +42,7 @@
             'DDR4', 'DDR5',
             'Basic', 'Premium', ' SFX', ' SFX-L'
         ];
-        document.querySelectorAll('input.svelte-16s38gk:not(.keyword-highlighted)').forEach(input => {
+        document.querySelectorAll('input.svelte-1ru2lj8:not(.keyword-highlighted)').forEach(input => {
             const matches = keywords.filter(k => input.value.includes(k));
             if (matches.length > 0) {
                 const rect = input.getBoundingClientRect();

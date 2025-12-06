@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Pegasus CS enhanced
-// @version 3.11.9
+// @version 3.12.1
 // @author Jason
 // @description 高亮負數庫存及輸入框關鍵詞，GP 計算功能
 // @match https://shop.pegasus.hk/portal/orders/*
@@ -98,14 +98,14 @@
         const total = findInputByExactLabel('總額');
         const fee = findInputByExactLabel('附加費');
         const cost = findInputByExactLabel('總成本');
-        const ship  = findInputByExactLabel('運費');
+        const ship = findInputByExactLabel('運費');
 
         console.log('[GP DEBUG] 總額 input:', total?.value);
         console.log('[GP DEBUG] 附加費 input:', fee?.value);
         console.log('[GP DEBUG] 總成本 input:', cost?.value);
         console.log('[GP DEBUG] 運費 input:', ship?.value);
 
-        if (!total || !fee || !cost) {
+        if (!total || !fee || !cost || !ship) {
             console.warn('[GP DEBUG] ❌ 找不到 總額 / 附加費 / 總成本 / 運費 其中之一');
             return;
         }
@@ -135,15 +135,22 @@
             gpContainer.style.top = `${rect.top + window.scrollY}px`;
 
             const get = input => parseFloat(input.value.replace(/,/g, '')) || 0;
-            const gp = get(total) - get(fee) - get(cost) - get(ship);
+
+            const totalVal = get(total);
+            const feeVal = get(fee);
+            const costVal = get(cost);
+            const shipVal = get(ship);
+
+            // GP 仍然是：總額 - 附加費 - 總成本 - 運費
+            const gp = totalVal - feeVal - costVal - shipVal;
 
             const valueSpan = gpContainer.querySelector('.gp-value');
             const low1Span = gpContainer.querySelector('.gp-low1');
             const low2Span = gpContainer.querySelector('.gp-low2');
 
-            //這裡示範，以「GP 的 1% / 2%」當作 1% low / 2% low（你可以依自己邏輯改）
-            const low1 = gp * 0.99;
-            const low2 = gp * 0.98;
+            // 改為以「總額」計算 1% / 2% low
+            const low1 = totalVal * 0.99; // 總額少 1%
+            const low2 = totalVal * 0.98; // 總額少 2%
 
             valueSpan.textContent = gp.toFixed(1);
             low1Span.textContent = low1.toFixed(1);

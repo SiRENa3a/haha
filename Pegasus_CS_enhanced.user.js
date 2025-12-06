@@ -138,7 +138,7 @@
             const feeVal = get(fee);
             const costVal = get(cost);
 
-            // GP 仍然是：總額 - 附加費 - 總成本 - 運費
+            // GP 仍然是：總額 - 附加費 - 總成本
             const gp = totalVal - feeVal - costVal;
 
             const valueSpan = gpContainer.querySelector('.gp-value');

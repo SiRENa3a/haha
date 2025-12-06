@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Pegasus CS enhanced
-// @version 3.11.8
+// @version 3.11.9
 // @author Jason
 // @description 高亮負數庫存及輸入框關鍵詞，GP 計算功能
 // @match https://shop.pegasus.hk/portal/orders/*
@@ -98,13 +98,15 @@
         const total = findInputByExactLabel('總額');
         const fee = findInputByExactLabel('附加費');
         const cost = findInputByExactLabel('總成本');
+        const ship  = findInputByExactLabel('運費');
 
         console.log('[GP DEBUG] 總額 input:', total?.value);
         console.log('[GP DEBUG] 附加費 input:', fee?.value);
         console.log('[GP DEBUG] 總成本 input:', cost?.value);
+        console.log('[GP DEBUG] 運費 input:', ship?.value);
 
         if (!total || !fee || !cost) {
-            console.warn('[GP DEBUG] ❌ 找不到總額、附加費或總成本');
+            console.warn('[GP DEBUG] ❌ 找不到 總額 / 附加費 / 總成本 / 運費 其中之一');
             return;
         }
 
@@ -119,7 +121,11 @@
             gpContainer.style.padding = '2px 6px';
             gpContainer.style.borderRadius = '4px';
             gpContainer.style.boxShadow = '0 0 3px rgba(0,0,0,0.15)';
-            gpContainer.innerHTML = 'GP：<span class="gp-value">0.0</span>';
+            gpContainer.innerHTML = `
+            GP：<span class="gp-value">0.0</span>
+            ｜1% low：<span class="gp-low1">0.0</span>
+            ｜2% low：<span class="gp-low2">0.0</span>
+        `;
             document.body.appendChild(gpContainer);
         }
 
@@ -129,13 +135,25 @@
             gpContainer.style.top = `${rect.top + window.scrollY}px`;
 
             const get = input => parseFloat(input.value.replace(/,/g, '')) || 0;
-            const gp = get(total) - get(fee) - get(cost);
+            const gp = get(total) - get(fee) - get(cost) - get(ship);
 
             const valueSpan = gpContainer.querySelector('.gp-value');
-            valueSpan.textContent = gp.toFixed(1);
-            valueSpan.style.color = gp >= 0 ? 'green' : 'red';
-        }
+            const low1Span = gpContainer.querySelector('.gp-low1');
+            const low2Span = gpContainer.querySelector('.gp-low2');
 
+            //這裡示範，以「GP 的 1% / 2%」當作 1% low / 2% low（你可以依自己邏輯改）
+            const low1 = gp * 0.99;
+            const low2 = gp * 0.98;
+
+            valueSpan.textContent = gp.toFixed(1);
+            low1Span.textContent = low1.toFixed(1);
+            low2Span.textContent = low2.toFixed(1);
+
+            const color = gp >= 0 ? 'green' : 'red';
+            valueSpan.style.color = color;
+            low1Span.style.color = color;
+            low2Span.style.color = color;
+        }
         updatePositionAndValue();
         window.addEventListener('resize', updatePositionAndValue);
         window.addEventListener('scroll', updatePositionAndValue);

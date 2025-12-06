@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Pegasus CS enhanced
-// @version 3.12.1
+// @version 3.12.2
 // @author Jason
 // @description 高亮負數庫存及輸入框關鍵詞，GP 計算功能
 // @match https://shop.pegasus.hk/portal/orders/*
@@ -149,8 +149,8 @@
             const low2Span = gpContainer.querySelector('.gp-low2');
 
             // 改為以「總額」計算 1% / 2% low
-            const low1 = totalVal * 0.99; // 總額少 1%
-            const low2 = totalVal * 0.98; // 總額少 2%
+            const low1 = totalVal * 0.99 - costVal; // 總額少 1%
+            const low2 = totalVal * 0.98 - costVal; // 總額少 2%
 
             valueSpan.textContent = gp.toFixed(1);
             low1Span.textContent = low1.toFixed(1);
